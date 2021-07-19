@@ -7,7 +7,7 @@ from aiohttp import ContentTypeError, ClientSession, web
 from aiohttp.web import Request, Response
 from yarl import URL
 
-from mautrix.types import RoomID, JSON
+from mautrix.types import RoomID, JSON, MessageType
 from mautrix.util.config import BaseProxyConfig, ConfigUpdateHelper
 
 from maubot import Plugin
@@ -72,7 +72,7 @@ class TodesktopBot(Plugin):
         }
         try:
             message = self.config["message_format"].format(**params)
-            await self.client.send_markdown(room_id, message)
+            await self.client.send_markdown(room_id, message, msgtype=MessageType.NOTICE)
         except Exception:
             self.log.exception("Error sending message to Matrix")
             raise web.HTTPInternalServerError(text="500: Internal Server Error\n"
