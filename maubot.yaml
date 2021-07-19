@@ -1,0 +1,12 @@
+maubot: 0.1.2
+id: com.beeper.gitlab-todesktop-bot
+version: 0.1.0
+license: Apache-2.0
+modules:
+- beeper_todesktop
+main_class: TodesktopBot
+
+extra_files:
+- base-config.yaml
+
+webapp: true

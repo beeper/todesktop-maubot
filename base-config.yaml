@@ -1,0 +1,13 @@
+webhook_secret: "put a random password here"
+gitlab_url: https://gitlab.com
+gitlab_token: "create a personal access token with read api access here"
+build_name_map:
+  todesktop: Beeper
+  todesktop-beta: Beeper Beta
+message_format: |
+  {build_name} commit [{commit_hash}]({commit_url}) built successfully 🎉
+
+  * Linux 🐧: [Debian]({todesktop_url}/linux/deb/x64), [AppImage]({todesktop_url}/linux/appimage/x64),
+    [Snap]({todesktop_url}/linux/snap/x64)
+  * macOS 🍎: [Intel]({todesktop_url}/mac/dmg/x64), [Apple Silicon]({todesktop_url}/mac/dmg/arm64)
+  * Windows 🪟: [NSIS x86]({todesktop_url}/windows/nsis/x64)
