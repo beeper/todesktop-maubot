@@ -1,4 +1,5 @@
 from typing import Type, Match, Optional
+import asyncio
 import secrets
 import json
 import re
@@ -102,6 +103,6 @@ class TodesktopBot(Plugin):
         except json.JSONDecodeError:
             return Response(status=400, text="400: Bad request\nRequest body not JSON\n")
 
-        message = await self.handle_webhook(room_id, data)
+        message = await asyncio.shield(self.handle_webhook(room_id, data))
 
         return Response(status=200, text=f"200: OK\n{message}\n")
