@@ -73,7 +73,7 @@ class TodesktopBot(Plugin):
         apk_path = project["apk_path_map"][data["build_name"]]
         repo_url = data["repository"]["homepage"]
         job_id = data["build_id"]
-        return {"apk_url": f"{repo_url}/-/jobs/{job_id}/artifacts/browse/{apk_path}"}
+        return {"apk_url": f"{repo_url}/-/jobs/{job_id}/artifacts/raw/{apk_path}"}
 
     async def handle_webhook(self, room_id: RoomID, data: JSON) -> str:
         try:
