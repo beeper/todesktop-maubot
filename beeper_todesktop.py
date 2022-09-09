@@ -39,6 +39,7 @@ class TodesktopBot(Plugin):
         self.webhook_handlers = {
             "todesktop": self.handle_todesktop,
             "android": self.handle_android,
+            "webhook": self.handle_custom_webhook,
         }
 
     @classmethod
@@ -75,6 +76,13 @@ class TodesktopBot(Plugin):
         job_id = data["build_id"]
         return {"apk_url": f"{repo_url}/-/jobs/{job_id}/artifacts/raw/{apk_path}"}
 
+    @staticmethod
+    async def handle_custom_webhook(project: Dict[str, Any], data: JSON) -> Dict[str, str]:
+        data = {**data}
+        data.pop("sha")
+        data.pop("build_name")
+        return data
+
     async def handle_webhook(self, room_id: RoomID, data: JSON) -> str:
         try:
             project = self.config["projects"][data["project_id"]]
@@ -86,10 +94,15 @@ class TodesktopBot(Plugin):
             extra_params = await self.webhook_handlers[project["type"]](project, data)
         except ValueError as e:
             return str(e)
+        try:
+            commit_url = URL(data["repository"]["homepage"]) / "-" / "commit" / data["sha"]
+        except KeyError:
+            # Custom webhooks don't have the repository field, but should provide commit_url in data
+            commit_url = ""
         message = project["message_format"].format(**{
             "build_name": project["build_name_map"][data["build_name"]],
             "commit_hash": data["sha"][:8],
-            "commit_url": URL(data["repository"]["homepage"]) / "-" / "commit" / data["sha"],
+            "commit_url": commit_url,
             **extra_params,
         })
         try:
@@ -105,8 +118,11 @@ class TodesktopBot(Plugin):
         try:
             token = request.headers["X-Gitlab-Token"]
         except KeyError:
-            return Response(text="401: Unauthorized\n"
-                                 "Missing auth token header\n", status=401)
+            try:
+                token = request.headers["Authorization"].removeprefix("Bearer ")
+            except KeyError:
+                return Response(text="401: Unauthorized\n"
+                                     "Missing auth token header\n", status=401)
         if token != self.config["webhook_secret"]:
             return Response(text="401: Unauthorized\n", status=401)
         try:
