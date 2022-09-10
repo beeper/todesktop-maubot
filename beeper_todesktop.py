@@ -81,6 +81,8 @@ class TodesktopBot(Plugin):
         data = {**data}
         data.pop("sha")
         data.pop("build_name")
+        build_version = data.get("build_version")
+        data["build_version_whitespace"] = f" / {build_version}" if build_version else ""
         return data
 
     async def handle_webhook(self, room_id: RoomID, data: JSON) -> str:
