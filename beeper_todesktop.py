@@ -101,14 +101,20 @@ class TodesktopBot(Plugin):
         except KeyError:
             # Custom webhooks don't have the repository field, but should provide commit_url in data
             commit_url = ""
-        message = project["message_format"].format(**{
+        params = {
             "build_name": project["build_name_map"][data["build_name"]],
             "commit_hash": data["sha"][:8],
             "commit_url": commit_url,
             **extra_params,
-        })
+        }
+        if data["build_status"] == "success":
+            message = project["message_format"].format(**params)
+            msgtype = MessageType.NOTICE
+        else:
+            message = project["failed_message_format"].format(**params)
+            msgtype = MessageType.TEXT
         try:
-            await self.client.send_markdown(room_id, message, msgtype=MessageType.NOTICE)
+            await self.client.send_markdown(room_id, message, msgtype=msgtype)
         except Exception:
             self.log.exception("Error sending message to Matrix")
             raise web.HTTPInternalServerError(text="500: Internal Server Error\n"
