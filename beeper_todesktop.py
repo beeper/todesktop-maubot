@@ -90,8 +90,6 @@ class TodesktopBot(Plugin):
             project = self.config["projects"][data["project_id"]]
         except KeyError:
             raise web.HTTPNotFound(text="404: Unknown project ID")
-        if data["build_status"] != "success":
-            return "Non-success webhook ignored"
         try:
             extra_params = await self.webhook_handlers[project["type"]](project, data)
         except ValueError as e:
